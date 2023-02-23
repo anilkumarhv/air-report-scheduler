@@ -1,0 +1,16 @@
+CREATE SEQUENCE  IF NOT EXISTS runway_seq_gen START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
+
+CREATE TABLE IF NOT EXISTS runways (
+   id BIGINT NOT NULL DEFAULT nextval('runway_seq_gen') PRIMARY KEY,
+   length_ft INTEGER,
+   width_ft INTEGER,
+   surface VARCHAR(255),
+   lights BOOLEAN,
+   ident1 VARCHAR(255),
+   ident2 VARCHAR(255),
+   bearing1 DOUBLE PRECISION,
+   bearing2 DOUBLE PRECISION,
+   station_id BIGINT
+);
+
+ALTER TABLE runways ADD CONSTRAINT FK_RUNWAYS_ON_STATION FOREIGN KEY (station_id) REFERENCES station (id);
