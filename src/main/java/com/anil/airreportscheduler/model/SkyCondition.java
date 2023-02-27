@@ -39,4 +39,8 @@ public class SkyCondition implements Serializable {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "pirep_id")
     private Pirep pirep;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "metar_id")
+    private Metar metar;
 }

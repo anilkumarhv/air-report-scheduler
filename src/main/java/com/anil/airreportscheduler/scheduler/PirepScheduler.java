@@ -1,5 +1,6 @@
 package com.anil.airreportscheduler.scheduler;
 
+import com.anil.airreportscheduler.service.MetarService;
 import com.anil.airreportscheduler.service.PirepService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -14,16 +15,17 @@ import java.time.format.DateTimeFormatter;
 public class PirepScheduler {
 
     private final PirepService pirepService;
+    private final MetarService metarService;
 
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-    public PirepScheduler(PirepService pirepService) {
+    public PirepScheduler(PirepService pirepService, MetarService metarService) {
         this.pirepService = pirepService;
+        this.metarService = metarService;
     }
 
-    //    @Scheduled(fixedDelay = 60000)
-//    @Scheduled(cron = "${name-of-the-cron:0 0 0/1 * * ?}")
-    @Scheduled(fixedRate=60*60*1000)
+    @Scheduled(cron = "${pirep-scheduler-cron:0 0 0/1 * * ?}")
+//    @Scheduled(fixedRate=60*60*1000)
     @Async
     public void pirepSchedulerTask() {
         log.info("pirep scheduler started. Execution Start Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
@@ -34,6 +36,19 @@ public class PirepScheduler {
         }
 
         log.info("pirep scheduler completed successfully. Execution end Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
+    }
+
+    @Scheduled(cron = "${metar-report-cron:0 0/5 * * * ?}")
+    @Async
+    public void metarSchedulerTask() {
+        log.info("Metar Report scheduler started. Execution Start Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
+        try {
+            metarService.getMetarFromAddsServer();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+
+        log.info("Metar Report scheduler completed successfully. Execution end Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
     }
 
 }

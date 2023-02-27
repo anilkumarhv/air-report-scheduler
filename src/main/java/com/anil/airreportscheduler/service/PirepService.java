@@ -40,7 +40,7 @@ public class PirepService {
         if (Objects.requireNonNull(response.getBody()).getData().size() > 0) {
             try {
                 response.getBody().getData().stream()
-                        .filter(pirep -> Objects.equals(pirep.getReportType(), AircraftType.PIREP.name()))
+                        .filter(pirep -> !Objects.equals(pirep.getReportType(), AircraftType.AIREP.name()))
                         .forEach(this::extractAndIngestReport);
             } catch (Exception e) {
                 log.error("Exception while Ingesting the Aircraft report data. error message {}", e.getMessage());
