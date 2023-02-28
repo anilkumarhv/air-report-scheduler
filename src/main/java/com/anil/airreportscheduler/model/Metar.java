@@ -8,16 +8,18 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Objects;
 
-@Data
+@Getter
+@Setter
+//@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -102,11 +104,30 @@ public class Metar implements Serializable {
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "quality_control_flags")
     @XmlElement(name = "quality_control_flags")
-    private List<MetarQualityControlFlags> qualityControlFlags;
+    private List<MetarQualityControlFlags> qualityControlFlags = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "metar", cascade = CascadeType.ALL, orphanRemoval = true)
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "sky_condition")
     @XmlElement(name = "sky_condition")
-    private List<SkyCondition> skyConditions;
+    private List<SkyCondition> skyConditions = new ArrayList<>();
+
+    public void setSkyConditions(List<SkyCondition> skyConditions) {
+        this.skyConditions = skyConditions;
+        if (Objects.requireNonNull(skyConditions).size() > 0) {
+            for (SkyCondition skyCondition : skyConditions) {
+                skyCondition.setMetar(this);
+            }
+        }
+    }
+
+    public void setQualityControlFlags(List<MetarQualityControlFlags> qualityControlFlags) {
+        this.qualityControlFlags = qualityControlFlags;
+
+        if (Objects.requireNonNull(qualityControlFlags).size() > 0) {
+            for (MetarQualityControlFlags qualityControlFlag : qualityControlFlags) {
+                qualityControlFlag.setMetar(this);
+            }
+        }
+    }
 }
