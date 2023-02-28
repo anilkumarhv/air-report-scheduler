@@ -3,22 +3,36 @@ package com.anil.airreportscheduler.model;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -76,23 +90,59 @@ public class Pirep implements Serializable {
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "quality_control_flags")
     @XmlElement(name = "quality_control_flags")
-    private List<QualityControlFlags> qualityControlFlags;
+    private List<QualityControlFlags> qualityControlFlags = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "pirep", cascade = CascadeType.ALL, orphanRemoval = true)
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "icing_condition")
     @XmlElement(name = "icing_condition")
-    private List<IcingCondition> icingConditions;
+    private List<IcingCondition> icingConditions = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "pirep", cascade = CascadeType.ALL, orphanRemoval = true)
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "sky_condition")
     @XmlElement(name = "sky_condition")
-    private List<SkyCondition> skyConditions;
+    private List<SkyCondition> skyConditions = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "pirep", cascade = CascadeType.ALL, orphanRemoval = true)
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "turbulence_condition")
     @XmlElement(name = "turbulence_condition")
-    private List<TurbulenceCondition> turbulenceConditions;
+    private List<TurbulenceCondition> turbulenceConditions = new ArrayList<>();
+
+    public void setSkyConditions(List<SkyCondition> skyConditions) {
+        this.skyConditions = skyConditions;
+        if (Objects.requireNonNull(skyConditions).size() > 0) {
+            for (SkyCondition skyCondition : skyConditions) {
+                skyCondition.setPirep(this);
+            }
+        }
+    }
+
+    public void setQualityControlFlags(List<QualityControlFlags> qualityControlFlags) {
+        this.qualityControlFlags = qualityControlFlags;
+        if (Objects.requireNonNull(qualityControlFlags).size() > 0) {
+            for (QualityControlFlags qualityControlFlag : qualityControlFlags) {
+                qualityControlFlag.setPirep(this);
+            }
+        }
+    }
+
+    public void setIcingConditions(List<IcingCondition> icingConditions) {
+        this.icingConditions = icingConditions;
+        if (Objects.requireNonNull(icingConditions).size() > 0) {
+            for (IcingCondition icingCondition : icingConditions) {
+                icingCondition.setPirep(this);
+            }
+        }
+    }
+
+    public void setTurbulenceConditions(List<TurbulenceCondition> turbulenceConditions) {
+        this.turbulenceConditions = turbulenceConditions;
+        if (Objects.requireNonNull(turbulenceConditions).size() > 0) {
+            for (TurbulenceCondition turbulenceCondition : turbulenceConditions) {
+                turbulenceCondition.setPirep(this);
+            }
+        }
+    }
 }

@@ -1,6 +1,6 @@
 CREATE SEQUENCE IF NOT EXISTS metar_quality_control_flags_SEQ START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
 
-CREATE TABLE metar_quality_control_flags
+CREATE TABLE IF NOT EXISTS metar_quality_control_flags
 (
     id                         BIGINT NOT NULL DEFAULT nextval('metar_quality_control_flags_SEQ') PRIMARY KEY,
     corrected                  VARCHAR(255),

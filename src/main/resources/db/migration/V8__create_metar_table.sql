@@ -35,4 +35,4 @@ CREATE TABLE IF NOT EXISTS metar
     type                          VARCHAR(255)
 );
 
-CREATE INDEX idx_metar_code_type ON metar (code, type);
+create index IF NOT EXISTS idx_metar_code_type on metar(code, type);
