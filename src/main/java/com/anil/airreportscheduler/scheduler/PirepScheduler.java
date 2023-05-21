@@ -24,7 +24,7 @@ public class PirepScheduler {
         this.metarService = metarService;
     }
 
-    @Scheduled(cron = "${pirep-scheduler-cron:0 0 0/1 * * ?}")
+    @Scheduled(cron = "${pirep-scheduler-cron:0 0/10 * * * ?}")
 //    @Scheduled(fixedRate=60*60*1000)
     @Async
     public void pirepSchedulerTask() {

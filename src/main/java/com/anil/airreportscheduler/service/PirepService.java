@@ -71,7 +71,7 @@ public class PirepService {
         requestParam.add("dataSource", ReportType.AIRCRAFT.getReportType());
         requestParam.add("requestType", "retrieve");
         requestParam.add("format", "xml");
-        requestParam.add("hoursBeforeNow", "1");
+        requestParam.add("hoursBeforeNow", "0.20");
         return requestParam;
     }
 }
