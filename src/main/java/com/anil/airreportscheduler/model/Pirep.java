@@ -86,6 +86,9 @@ public class Pirep implements Serializable {
     @JacksonXmlProperty(localName = "vert_gust_kt")
     private String vertGustKt;
 
+    @Embedded
+    private AircraftCondition aircraftCondition;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "pirep", cascade = CascadeType.ALL, orphanRemoval = true)
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "quality_control_flags")

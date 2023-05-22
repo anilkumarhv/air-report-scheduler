@@ -113,6 +113,9 @@ public class Metar implements Serializable {
     @JacksonXmlProperty(localName = "elevation_m")
     private Double elevationM;
 
+    @Embedded
+    private AircraftCondition aircraftCondition;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "metar", cascade = CascadeType.ALL, orphanRemoval = true)
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "quality_control_flags")

@@ -1,9 +1,6 @@
 package com.anil.airreportscheduler.service;
 
-import com.anil.airreportscheduler.model.Aircraft;
-import com.anil.airreportscheduler.model.Metar;
-import com.anil.airreportscheduler.model.MetarReportResponse;
-import com.anil.airreportscheduler.model.ReportType;
+import com.anil.airreportscheduler.model.*;
 import com.anil.airreportscheduler.repository.MetarRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -39,6 +37,8 @@ public class MetarService {
         if (Objects.requireNonNull(response.getBody()).getData().size() > 0) {
             try {
                 response.getBody().getData()
+//                        .stream()
+//                        .filter(metar -> Objects.equals(metar.getMetarType(), AircraftType.METER.name()))
                         .forEach(this::extractAndIngestReport);
             } catch (Exception e) {
                 log.error("Exception while Ingesting the Metar report data. error message {}", e.getMessage());
@@ -50,6 +50,7 @@ public class MetarService {
 
     private void extractAndIngestReport(Metar metar) {
         metar.setAircraft(extractAndSetAircraft(metar));
+        metar.setAircraftCondition(extractAndSetAircraftConditionType(metar));
         metarRepository.save(metar);
     }
 
@@ -72,5 +73,16 @@ public class MetarService {
         /* retrieve Metar data last 5min */
         requestParam.add("hoursBeforeNow", "0.10");
         return requestParam;
+    }
+
+    private AircraftCondition extractAndSetAircraftConditionType(Metar metar) {
+        AircraftCondition aircraftCondition = new AircraftCondition();
+        aircraftCondition.setIsSkyType(setConditionType(metar.getSkyConditions()));
+        aircraftCondition.setIsQualityControlFlagType(setConditionType(metar.getQualityControlFlags()));
+        return aircraftCondition;
+    }
+
+    private <T> Boolean setConditionType(List<T> conditionType) {
+        return conditionType != null && conditionType.size() > 0;
     }
 }

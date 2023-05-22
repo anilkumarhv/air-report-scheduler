@@ -1,10 +1,6 @@
 package com.anil.airreportscheduler.service;
 
-import com.anil.airreportscheduler.model.Aircraft;
-import com.anil.airreportscheduler.model.AircraftReportResponse;
-import com.anil.airreportscheduler.model.AircraftType;
-import com.anil.airreportscheduler.model.Pirep;
-import com.anil.airreportscheduler.model.ReportType;
+import com.anil.airreportscheduler.model.*;
 import com.anil.airreportscheduler.repository.PirepRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -52,6 +49,7 @@ public class PirepService {
 
     private void extractAndIngestReport(Pirep pirep) {
         pirep.setAircraft(extractAndSetAircraft(pirep));
+        pirep.setAircraftCondition(extractAndSetAircraftConditionType(pirep));
         pirepRepository.save(pirep);
     }
 
@@ -73,5 +71,18 @@ public class PirepService {
         requestParam.add("format", "xml");
         requestParam.add("hoursBeforeNow", "0.20");
         return requestParam;
+    }
+
+    private AircraftCondition extractAndSetAircraftConditionType(Pirep pirep) {
+        AircraftCondition aircraftCondition = new AircraftCondition();
+        aircraftCondition.setIsIcingType(setConditionType(pirep.getIcingConditions()));
+        aircraftCondition.setIsSkyType(setConditionType(pirep.getSkyConditions()));
+        aircraftCondition.setIsTurbulenceType(setConditionType(pirep.getTurbulenceConditions()));
+        aircraftCondition.setIsQualityControlFlagType(setConditionType(pirep.getQualityControlFlags()));
+        return aircraftCondition;
+    }
+
+    private <T> Boolean setConditionType(List<T> conditionType) {
+        return conditionType != null && conditionType.size() > 0;
     }
 }
