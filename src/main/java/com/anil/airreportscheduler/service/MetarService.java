@@ -62,7 +62,7 @@ public class MetarService {
     }
 
     private String extractCodeFromRawText(final String rawText) {
-        return rawText.substring(1, 3);
+        return rawText.substring(1, 4);
     }
 
     private MultiValueMap<String, String> getMetarRequestParam() {
