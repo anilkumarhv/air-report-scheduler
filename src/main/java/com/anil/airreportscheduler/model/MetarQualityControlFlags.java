@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serial;
+import java.io.Serializable;
 
 @Getter
 @Setter
@@ -26,7 +27,7 @@ import java.io.Serial;
 @Entity
 @Table(name = "metar_quality_control_flags")
 @JacksonXmlRootElement(localName = "quality_control_flags")
-public class MetarQualityControlFlags {
+public class MetarQualityControlFlags implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
