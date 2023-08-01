@@ -23,6 +23,12 @@ jobs:
 
       - name: Build with Maven
         run: mvn clean install
+
+      - name: Archive coverage data
+        uses: actions/upload-artifact@v2
+        with:
+          name: maven-coverage-data-jacoco
+          path: .qodana/code-coverage
         
       - name: 'Qodana Scan'
         uses: JetBrains/qodana-action@main
