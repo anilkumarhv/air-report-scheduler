@@ -71,13 +71,13 @@ public class Metar implements Serializable {
     @JacksonXmlProperty(localName = "dewpoint_c")
     private Double dewpointC;
     @JacksonXmlProperty(localName = "wind_dir_degrees")
-    private Integer windDirDegrees;
+    private String windDirDegrees;
     @JacksonXmlProperty(localName = "wind_speed_kt")
     private Integer windSpeedKt;
     @JacksonXmlProperty(localName = "wind_gust_kt")
     private Integer windGustKt;
     @JacksonXmlProperty(localName = "visibility_statute_mi")
-    private Double visibilityStatuteMi;
+    private String visibilityStatuteMi;
     @JacksonXmlProperty(localName = "altim_in_hg")
     private Double altimInHg;
     @JacksonXmlProperty(localName = "sea_level_pressure_mb")

@@ -71,7 +71,7 @@ public class Pirep implements Serializable {
     @JacksonXmlProperty(localName = "temp_c")
     private Double tempC;
     @JacksonXmlProperty(localName = "wind_dir_degrees")
-    private Integer windDirDegrees;
+    private String windDirDegrees;
     @JacksonXmlProperty(localName = "wind_peed_kt")
     private Integer windSpeedKt;
     @JacksonXmlProperty(localName = "report_type")
@@ -80,7 +80,7 @@ public class Pirep implements Serializable {
     @JacksonXmlProperty(localName = "raw_text")
     private String rawText;
     @JacksonXmlProperty(localName = "visibility_statute_mi")
-    private Integer visibilityStatuteMi;
+    private String visibilityStatuteMi;
     @JacksonXmlProperty(localName = "wx_tring")
     private String wxString;
     @JacksonXmlProperty(localName = "vert_gust_kt")
