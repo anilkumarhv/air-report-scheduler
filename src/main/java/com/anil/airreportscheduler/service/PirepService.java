@@ -51,6 +51,7 @@ public class PirepService {
         pirep.setAircraft(extractAndSetAircraft(pirep));
         pirep.setAircraftCondition(extractAndSetAircraftConditionType(pirep));
         pirepRepository.save(pirep);
+        log.info("Successfully saved Pirep: {}", pirep.getRawText());
     }
 
     private Aircraft extractAndSetAircraft(Pirep pirep) {
