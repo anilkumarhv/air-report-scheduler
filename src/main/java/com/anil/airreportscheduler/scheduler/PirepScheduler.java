@@ -25,30 +25,27 @@ public class PirepScheduler {
     }
 
     @Scheduled(cron = "${pirep-scheduler-cron:0 0/10 * * * ?}")
-//    @Scheduled(fixedRate=60*60*1000)
     @Async
     public void pirepSchedulerTask() {
-        log.info("pirep scheduler started. Execution Start Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
+        log.info("PIREP scheduler started at {}", dateTimeFormatter.format(LocalDateTime.now()));
         try {
             pirepService.getAircraftReportFromAddsServer();
-        } catch (Exception e) {
-            log.error(e.getMessage());
+            log.info("PIREP scheduler completed successfully at {}", dateTimeFormatter.format(LocalDateTime.now()));
+        } catch (RuntimeException e) {
+            log.error("PIREP scheduler failed: {}", e.getMessage(), e);
         }
-
-        log.info("pirep scheduler completed successfully. Execution end Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
     }
 
     @Scheduled(cron = "${metar-report-cron:0 0/5 * * * ?}")
     @Async
     public void metarSchedulerTask() {
-        log.info("Metar Report scheduler started. Execution Start Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
+        log.info("METAR scheduler started at {}", dateTimeFormatter.format(LocalDateTime.now()));
         try {
             metarService.getMetarFromAddsServer();
-        } catch (Exception e) {
-            log.error(e.getMessage());
+            log.info("METAR scheduler completed successfully at {}", dateTimeFormatter.format(LocalDateTime.now()));
+        } catch (RuntimeException e) {
+            log.error("METAR scheduler failed: {}", e.getMessage(), e);
         }
-
-        log.info("Metar Report scheduler completed successfully. Execution end Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
     }
 
 }
