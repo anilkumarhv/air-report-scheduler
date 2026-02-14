@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AviationController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, com.anil.airreportscheduler.config.RateLimitConfig.class})
 class AviationControllerTest {
 
     @Autowired
