@@ -48,6 +48,10 @@ public class PirepService {
     }
 
     private void extractAndIngestReport(Pirep pirep) {
+        if (pirepRepository.existsByRawText(pirep.getRawText())) {
+            log.debug("Duplicate PIREP detected, skipping: {}", pirep.getRawText());
+            return;
+        }
         pirep.setAircraft(extractAndSetAircraft(pirep));
         pirep.setAircraftCondition(extractAndSetAircraftConditionType(pirep));
         pirepRepository.save(pirep);

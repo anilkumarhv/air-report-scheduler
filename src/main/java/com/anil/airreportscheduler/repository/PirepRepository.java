@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PirepRepository extends JpaRepository<Pirep, Long> {
+    boolean existsByRawText(String rawText);
 }

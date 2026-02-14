@@ -51,6 +51,10 @@ public class MetarService {
     }
 
     private void extractAndIngestReport(Metar metar) {
+        if (metarRepository.existsByRawTextAndObservationTime(metar.getRawText(), metar.getObservationTime())) {
+            log.debug("Duplicate METAR detected, skipping: {}", metar.getRawText());
+            return;
+        }
         metar.setAircraft(extractAndSetAircraft(metar));
         metar.setAircraftCondition(extractAndSetAircraftConditionType(metar));
         metarRepository.save(metar);
