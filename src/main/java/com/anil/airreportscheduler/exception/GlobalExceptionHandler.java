@@ -1,5 +1,6 @@
 package com.anil.airreportscheduler.exception;
 
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 @Slf4j
@@ -31,6 +33,21 @@ public class GlobalExceptionHandler {
         response.put("errors", errors);
 
         log.warn("Validation failed: {}", errors);
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Map<String, Object>> handleConstraintViolationException(ConstraintViolationException ex) {
+        String errors = ex.getConstraintViolations().stream()
+            .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
+            .collect(Collectors.joining(", "));
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", ZonedDateTime.now().toString());
+        response.put("status", HttpStatus.BAD_REQUEST.value());
+        response.put("message", errors);
+
+        log.warn("Constraint violation: {}", errors);
         return ResponseEntity.badRequest().body(response);
     }
 
