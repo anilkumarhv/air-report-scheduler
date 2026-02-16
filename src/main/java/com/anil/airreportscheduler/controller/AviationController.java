@@ -4,9 +4,12 @@ import com.anil.airreportscheduler.model.Metar;
 import com.anil.airreportscheduler.model.MetarReportResponse;
 import com.anil.airreportscheduler.service.MetarService;
 import com.anil.airreportscheduler.service.PirepService;
+import com.anil.airreportscheduler.validation.ValidStationCode;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +24,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping(value = "/api/dataserver/aviation")
 @Slf4j
+@Validated
 public class AviationController {
 
     private final MetarService metarService;
@@ -32,9 +36,12 @@ public class AviationController {
     }
 
     @PostMapping("/metars")
-    public List<String> getMetar(@RequestParam(name = "station") String station,
-                                 @RequestParam(name = "startTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime startTime,
-                                 @RequestParam(name = "endTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime endTime) {
+    public List<String> getMetar(@RequestParam(name = "station") @ValidStationCode @NotNull String station,
+                                 @RequestParam(name = "startTime") @NotNull @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime startTime,
+                                 @RequestParam(name = "endTime") @NotNull @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime endTime) {
+        if (endTime.isBefore(startTime)) {
+            throw new IllegalArgumentException("End time must be after start time");
+        }
         ResponseEntity<MetarReportResponse> response = metarService.updateMetarsFromAddsServer(station, startTime, endTime);
         if (response.getBody() != null && response.getBody().getData() != null) {
             return response.getBody().getData().stream()
@@ -46,9 +53,12 @@ public class AviationController {
     }
 
     @GetMapping("/metars")
-    public List<String> getMetars(@RequestParam(name = "station") String station,
-                                 @RequestParam(name = "startTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime startTime,
-                                 @RequestParam(name = "endTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime endTime) {
+    public List<String> getMetars(@RequestParam(name = "station") @ValidStationCode @NotNull String station,
+                                 @RequestParam(name = "startTime") @NotNull @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime startTime,
+                                 @RequestParam(name = "endTime") @NotNull @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime endTime) {
+        if (endTime.isBefore(startTime)) {
+            throw new IllegalArgumentException("End time must be after start time");
+        }
         ResponseEntity<MetarReportResponse> response = metarService.getMetarsFromAddsServer(station, startTime, endTime);
         if (response.getBody() != null && response.getBody().getData() != null) {
             return response.getBody().getData().stream()

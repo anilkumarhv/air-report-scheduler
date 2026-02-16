@@ -2,7 +2,10 @@ package com.anil.airreportscheduler.service;
 
 import com.anil.airreportscheduler.model.*;
 import com.anil.airreportscheduler.repository.MetarRepository;
+import io.micrometer.core.instrument.Counter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -21,9 +24,17 @@ public class MetarService {
 
     private final MetarRepository metarRepository;
 
-    public MetarService(NOAAADDSService noaaaddsService, MetarRepository metarRepository) {
+    private final Counter metarIngestedCounter;
+
+    private final Counter metarDuplicateCounter;
+
+    public MetarService(NOAAADDSService noaaaddsService, MetarRepository metarRepository,
+                        @Qualifier("metarIngestedCounter") Counter metarIngestedCounter,
+                        @Qualifier("metarDuplicateCounter") Counter metarDuplicateCounter) {
         this.noaaaddsService = noaaaddsService;
         this.metarRepository = metarRepository;
+        this.metarIngestedCounter = metarIngestedCounter;
+        this.metarDuplicateCounter = metarDuplicateCounter;
     }
 
     public void getMetarFromAddsServer() {
@@ -51,9 +62,15 @@ public class MetarService {
     }
 
     private void extractAndIngestReport(Metar metar) {
+        if (metarRepository.existsByRawTextAndObservationTime(metar.getRawText(), metar.getObservationTime())) {
+            log.debug("Duplicate METAR detected, skipping: {}", metar.getRawText());
+            metarDuplicateCounter.increment();
+            return;
+        }
         metar.setAircraft(extractAndSetAircraft(metar));
         metar.setAircraftCondition(extractAndSetAircraftConditionType(metar));
         metarRepository.save(metar);
+        metarIngestedCounter.increment();
         log.info("Successfully saved Metar: {}", metar.getRawText());
     }
 
@@ -101,6 +118,7 @@ public class MetarService {
         }
     }
 
+    @Cacheable(value = "metarCache", key = "#station + '_' + #startTime + '_' + #endTime")
     public ResponseEntity<MetarReportResponse> getMetarsFromAddsServer(String station, ZonedDateTime startTime, ZonedDateTime endTime) {
         try {
             ResponseEntity<MetarReportResponse> metarResponseEntity = noaaaddsService.getAircraftReportFromAddsServer(MetarReportResponse.class, ReportType.METAR.getReportType(), getMetarRequestParams(station, startTime, endTime));

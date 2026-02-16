@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MetarRepository extends JpaRepository<Metar,Long> {
+    boolean existsByRawTextAndObservationTime(String rawText, java.time.ZonedDateTime observationTime);
 }

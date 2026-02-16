@@ -2,7 +2,9 @@ package com.anil.airreportscheduler.service;
 
 import com.anil.airreportscheduler.model.*;
 import com.anil.airreportscheduler.repository.PirepRepository;
+import io.micrometer.core.instrument.Counter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -19,9 +21,17 @@ public class PirepService {
 
     private final PirepRepository pirepRepository;
 
-    public PirepService(NOAAADDSService noaaaddsService, PirepRepository pirepRepository) {
+    private final Counter pirepIngestedCounter;
+
+    private final Counter pirepDuplicateCounter;
+
+    public PirepService(NOAAADDSService noaaaddsService, PirepRepository pirepRepository,
+                        @Qualifier("pirepIngestedCounter") Counter pirepIngestedCounter,
+                        @Qualifier("pirepDuplicateCounter") Counter pirepDuplicateCounter) {
         this.noaaaddsService = noaaaddsService;
         this.pirepRepository = pirepRepository;
+        this.pirepIngestedCounter = pirepIngestedCounter;
+        this.pirepDuplicateCounter = pirepDuplicateCounter;
     }
 
     public void getAircraftReportFromAddsServer() {
@@ -48,9 +58,15 @@ public class PirepService {
     }
 
     private void extractAndIngestReport(Pirep pirep) {
+        if (pirepRepository.existsByRawText(pirep.getRawText())) {
+            log.debug("Duplicate PIREP detected, skipping: {}", pirep.getRawText());
+            pirepDuplicateCounter.increment();
+            return;
+        }
         pirep.setAircraft(extractAndSetAircraft(pirep));
         pirep.setAircraftCondition(extractAndSetAircraftConditionType(pirep));
         pirepRepository.save(pirep);
+        pirepIngestedCounter.increment();
         log.info("Successfully saved Pirep: {}", pirep.getRawText());
     }
 
